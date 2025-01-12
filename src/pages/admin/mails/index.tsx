@@ -1,5 +1,7 @@
+// src/pages/admin/mails/index.tsx (this page show all mails as well as delete it one by one)
 import { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa"; // Import trash icon from react-icons
+import axios from "axios";
+import { FaTrash } from "react-icons/fa";
 
 interface Mail {
   _id: string;
@@ -20,12 +22,8 @@ const MailsPage = () => {
   useEffect(() => {
     const fetchMails = async () => {
       try {
-        const res = await fetch("/api/mails/get-mails");
-        if (!res.ok) {
-          throw new Error("Failed to fetch mails");
-        }
-        const data = await res.json();
-        setMails(data);
+        const res = await axios.get("/api/mails/get-mails");
+        setMails(res.data);
       } catch (error) {
         setError((error as Error).message);
       } finally {
@@ -38,15 +36,11 @@ const MailsPage = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/mails/delete-mail?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        throw new Error("Failed to delete mail");
+      const res = await axios.delete(`/api/mails/delete-mail?id=${id}`);
+      if (res.status === 200) {
+        // Remove the deleted mail from the state to reflect the change
+        setMails((prevMails) => prevMails.filter((mail) => mail._id !== id));
       }
-
-      // Remove the deleted mail from the state to reflect the change
-      setMails((prevMails) => prevMails.filter((mail) => mail._id !== id));
     } catch (error) {
       setError((error as Error).message);
     }

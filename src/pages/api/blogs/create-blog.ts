@@ -1,86 +1,44 @@
-import { NextResponse } from 'next/server';
-import Blog from 'src/lib/models/Blog';
+import { NextApiRequest, NextApiResponse } from "next";
+import blogService from "src/lib/services/blogService";
 
-export async function GET() {
-  try {
-    const blogs = await Blog.find().populate('author');
-    return NextResponse.json(blogs, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Error fetching blogs' }, { status: 500 });
-  }
-}
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method === "POST") {
+    try {
+      const {
+        title,
+        content,
+        authorId,
+        metaTitle,
+        metaDescription,
+        thumbnail,
+        topImage,
+        published,
+      } = req.body;
 
-export async function DELETE(request: Request) {
-  try {
-    const { id } = await request.json();
-    await Blog.findByIdAndDelete(id);
-    return NextResponse.json({ message: 'Blog deleted successfully' });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Error deleting blog' }, { status: 500 });
-  }
-}
+      if (!title || !content || !authorId) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
 
-export async function POST(request: Request) {
-  try {
-    const {
-      title,
-      content,
-      published,
-      authorId,
-      metaTitle,
-      metaDescription,
-      thumbnail,
-      topImage,
-    } = await request.json();
+      const blog = await blogService.createBlog({
+        title,
+        content,
+        authorId,
+        metaTitle,
+        metaDescription,
+        thumbnail,
+        topImage,
+        published,
+      });
 
-    const newBlog = await Blog.create({
-      title,
-      content,
-      published,
-      authorId,
-      metaTitle,
-      metaDescription,
-      thumbnail,
-      topImage,
-    });
-
-    return NextResponse.json(newBlog, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Error creating blog' }, { status: 500 });
-  }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const {
-      id,
-      title,
-      content,
-      published,
-      authorId,
-      metaTitle,
-      metaDescription,
-      thumbnail,
-      topImage,
-    } = await request.json();
-
-    const updatedBlog = await Blog.findByIdAndUpdate(id, {
-      title,
-      content,
-      published,
-      authorId,
-      metaTitle,
-      metaDescription,
-      thumbnail,
-      topImage,
-    }, { new: true });
-
-    return NextResponse.json(updatedBlog);
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: 'Error updating blog' }, { status: 500 });
+      res.status(201).json(blog);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  } else {
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

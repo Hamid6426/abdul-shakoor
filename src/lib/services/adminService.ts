@@ -1,7 +1,6 @@
-import Admin from '../models/Admin';
+import Admin from "../models/Admin";
 
 interface CreateAdminInput {
-  adminId: string;
   fullName: string;
   email: string;
   password: string;
@@ -13,10 +12,24 @@ class AdminService {
   // Create a new admin
   async createAdmin(input: CreateAdminInput) {
     try {
+      // Check if the email already exists before creating the admin
+      const existingAdmin = await Admin.findOne({ email: input.email });
+      if (existingAdmin) {
+        throw new Error("Email is already in use");
+      }
+
       const admin = new Admin(input);
       return await admin.save();
     } catch (error) {
       throw new Error(`Failed to create admin: ${error}`);
+    }
+  }
+
+  async getAdminByEmail(email: string) {
+    try {
+      return await Admin.findOne({ email }).select("+password"); // Explicitly include password
+    } catch (error) {
+      throw new Error(`Failed to fetch admin by email: ${error}`);
     }
   }
 
@@ -34,7 +47,7 @@ class AdminService {
     try {
       const admin = await Admin.findById(id);
       if (!admin) {
-        throw new Error('Admin not found');
+        throw new Error("Admin not found");
       }
       return admin;
     } catch (error) {
@@ -47,7 +60,7 @@ class AdminService {
     try {
       const admin = await Admin.findByIdAndUpdate(id, updates, { new: true });
       if (!admin) {
-        throw new Error('Admin not found');
+        throw new Error("Admin not found");
       }
       return admin;
     } catch (error) {
@@ -60,7 +73,7 @@ class AdminService {
     try {
       const admin = await Admin.findByIdAndDelete(id);
       if (!admin) {
-        throw new Error('Admin not found');
+        throw new Error("Admin not found");
       }
       return admin;
     } catch (error) {
