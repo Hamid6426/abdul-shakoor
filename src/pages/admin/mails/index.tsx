@@ -62,18 +62,17 @@ const MailsPage = () => {
       ) : (
         <div className="grid gap-4 grid-cols-1">
           {mails.map((mail) => (
-            <div key={mail._id} className="bg-white shadow-md p-4 rounded-lg">
-              <h2 className="text-lg font-bold mb-2">
+            <div key={mail._id} className="bg-white border-gray-300 border-2 p-4 rounded-lg">
+              <h2 className="text-lg font-bold pb-3 border-b-2">
                 {mail.firstName} {mail.lastName}
               </h2>
-              <p className="text-gray-600 mb-2">{mail.email}</p>
-              <h3 className="text-lg font-bold mb-2">{mail.subject}</h3>
-              <p className="text-gray-600 mb-2">{mail.message}</p>
+              <p className="py-3 border-b-2"><strong>Sender Email:</strong> {mail.email}</p>
+              <h3 className="text-lg font-bold p-3 bg-gray-200">{mail.subject}</h3>
+              <p className="py-3">{mail.message}</p>
               <div className="flex justify-between text-gray-600">
-                <p>Created At: {new Date(mail.createdAt).toLocaleString()}</p>
-                <p>Updated At: {new Date(mail.updatedAt).toLocaleString()}</p>
+                <p>Send At: {new Date(mail.createdAt).toLocaleString()}</p>
               </div>
-              <div className="text-right mt-4">
+              <div className="text-right mt-4  p-3 bg-gray-200">
                 <button
                   onClick={() => handleDelete(mail._id)}
                   className="text-red-500 hover:text-red-700 transition duration-300"

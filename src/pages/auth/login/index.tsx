@@ -1,12 +1,10 @@
-import { useState } from "react";
-import axios from "axios";
-import { useRouter } from "next/router";
+// src/pages/admin/login.tsx
+import { useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const LoginAdmin = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -24,13 +22,12 @@ const LoginAdmin = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/admins/login-admin", formData);
-      const { admin } = response.data;
-      // Store the admin data (excluding password) in localStorage
-      localStorage.setItem("admin", JSON.stringify(admin));
-      router.push("/admin/dashboard");
+      const response = await axios.post('/api/admins/login-admin', formData);
+
+      // Store the token in a cookie (this will be handled by the server)
+      router.push('/admin/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to log in");
+      setError(err.response?.data?.message || 'Failed to log in');
     } finally {
       setLoading(false);
     }
@@ -78,7 +75,7 @@ const LoginAdmin = () => {
           className="w-full py-2 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 focus:outline-none"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>
